@@ -7,3 +7,4 @@ gui,--,--,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.99,32,1.0,0.01,0.1,4,1000000,277
 5,High Gamma,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.999,32,1.0,0.01,0.1,4,500000,1268,302.8,3110.0,288.5,3480.6,"n_ep=1268, mean=302.8, best=3110.0, last20=288.5. Far-sighted — values long-term bunker preservation"
 6,Large Batch,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.99,128,1.0,0.01,0.1,4,500000,1146,856.5,7330.0,1566.8,8728.8,"n_ep=1146, mean=856.5, best=7330.0, last20=1566.8. Smoother gradients — more stable but slower per update"
 7,Small Batch,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.99,16,1.0,0.01,0.1,4,500000,1262,322.8,2000.0,351.8,2324.2,"n_ep=1262, mean=322.8, best=2000.0, last20=351.8. Noisy gradients — high variance, may diverge"
+8,High Epsilon End,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.99,32,1.0,0.1,0.1,4,500000,1572,278.9,2505.0,530.2,3150.4,"n_ep=1572, mean=278.9, best=2505.0, last20=530.2. 10% random forever — less exploitation, lower peak score"

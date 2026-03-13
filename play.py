@@ -58,7 +58,7 @@ class GreedyQPolicy:
 
     def predict(self, obs):
         action, _ = self._model.predict(obs, deterministic=True)
-        return int(action)
+        return int(np.atleast_1d(action)[0])
 
 
 class PlayGUI:
@@ -319,10 +319,10 @@ class PlayGUI:
                 ep_r, done = 0.0, False
 
                 while not done and self.running:
-                    action = policy.predict(obs)       # obs shape (1,4,84,84)
+                    action = policy.predict(obs)       # always int after np.atleast_1d
                     obs, rew, dones, _ = model_env.step([action])
-                    done   = bool(dones[0])
-                    ep_r  += float(rew[0])
+                    done   = bool(np.atleast_1d(dones)[0])
+                    ep_r  += float(np.atleast_1d(rew)[0])
                     self.total_steps += 1
 
                     # step display env with same action for rendering
@@ -333,7 +333,7 @@ class PlayGUI:
                     if term or trunc:
                         display_env.reset()
 
-                    self.act_var.set(ACTION_NAMES[int(action)])
+                    self.act_var.set(ACTION_NAMES[action])
                     self.sv["SCORE"].set(f"{ep_r:.0f}")
                     self.sv["STEPS"].set(f"{self.total_steps:,}")
                     time.sleep(0.016)

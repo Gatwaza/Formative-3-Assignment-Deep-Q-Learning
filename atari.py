@@ -42,6 +42,7 @@ gym.register_envs(ale_py)
 
 ENV_ID       = "ALE/DemonAttack-v5"
 CHECKPOINT   = "dqn_latest.zip"
+BEST_MODEL   = "dqn_best.zip"     # best scoring experiment — saved by run_experiments.py
 ACTION_NAMES = ["NOOP","FIRE","RIGHT","LEFT","RIGHTFIRE","LEFTFIRE"]
 
 # ── palette ───────────────────────────────────────────────────────────────────
@@ -249,16 +250,23 @@ class App:
         self.t_btn.pack(side=tk.LEFT, padx=4)
 
         self.p_btn = tk.Button(rc, text=" START PLAY ",
-                               bg=ACC3, fg=TEXT, font=FB, relief=tk.FLAT,
-                               padx=10, cursor="hand2",
-                               activebackground=ACC3,
+                               bg="white", fg="black", font=("Courier", 9, "bold"),
+                               relief=tk.FLAT, padx=10, cursor="hand2",
+                               activebackground="#dddddd", activeforeground="black",
                                command=self._toggle_play)
         self.p_btn.pack(side=tk.LEFT, padx=4)
 
+        tk.Button(rc, text=" ★ PLAY BEST ",
+                  bg=ACC4, fg="#000", font=FB, relief=tk.FLAT,
+                  padx=10, cursor="hand2",
+                  activebackground=ACC4,
+                  command=self._play_best
+                  ).pack(side=tk.LEFT, padx=4)
+
         tk.Button(rc, text=" RESET ",
-                  bg=PANEL, fg=TEXT, font=FB, relief=tk.FLAT,
-                  padx=8, cursor="hand2",
-                  activebackground=PANEL,
+                  bg="white", fg="black", font=("Courier", 9, "bold"),
+                  relief=tk.FLAT, padx=8, cursor="hand2",
+                  activebackground="#dddddd", activeforeground="black",
                   command=self._reset).pack(side=tk.LEFT, padx=4)
 
         # ── split body ───────────────────────────────────────────────────────
@@ -538,18 +546,30 @@ class App:
 
     def _mini_combo(self, parent, var, vals):
         sty = ttk.Style()
-        sty.configure("M.TCombobox", fieldbackground=DARK, background=DARK,
-                      foreground=TEXT, arrowcolor=ACC1,
-                      selectbackground=DARK, selectforeground=TEXT)
+        sty.configure("M.TCombobox",
+                      fieldbackground="white",
+                      background="white",
+                      foreground="black",
+                      arrowcolor="black",
+                      selectbackground="#cccccc",
+                      selectforeground="black",
+                      font=("Courier", 9, "bold"))
+        sty.map("M.TCombobox",
+                fieldbackground=[("readonly", "white")],
+                foreground=[("readonly", "black")],
+                selectbackground=[("readonly", "#cccccc")])
         c = ttk.Combobox(parent, textvariable=var, values=vals,
-                         state="readonly", style="M.TCombobox", width=9)
+                         state="readonly", style="M.TCombobox", width=9,
+                         font=("Courier", 9, "bold"))
         c.pack(side=tk.LEFT, padx=2)
         return c
 
     def _tiny(self, parent, default):
         var = tk.StringVar(value=default)
-        tk.Entry(parent, textvariable=var, width=5, bg=DARK, fg=TEXT,
-                 insertbackground=TEXT, font=FT,
+        tk.Entry(parent, textvariable=var, width=5,
+                 bg="white", fg="black",
+                 insertbackground="black",
+                 font=("Courier", 9, "bold"),
                  relief=tk.FLAT, bd=3).pack(side=tk.LEFT, padx=1)
         return var
 
@@ -590,27 +610,29 @@ class App:
 
     # ── charts ────────────────────────────────────────────────────────────────
     def _redraw_train_chart(self):
+        rewards = list(self.t_rewards)   # snapshot — prevents race condition
         self.t_ax.clear(); self.t_ax.set_facecolor(DARK); self._sax(self.t_ax)
-        xs = list(range(1, len(self.t_rewards)+1))
+        xs = list(range(1, len(rewards)+1))
         if xs:
-            self.t_ax.fill_between(xs, self.t_rewards, alpha=.2, color=ACC2)
-            self.t_ax.plot(xs, self.t_rewards, color=ACC2, lw=1.2)
-            if len(self.t_rewards) >= 10:
-                w  = min(10, len(self.t_rewards))
-                ma = np.convolve(self.t_rewards, np.ones(w)/w, mode="valid")
+            self.t_ax.fill_between(xs, rewards, alpha=.2, color=ACC2)
+            self.t_ax.plot(xs, rewards, color=ACC2, lw=1.2)
+            if len(rewards) >= 10:
+                w  = min(10, len(rewards))
+                ma = np.convolve(rewards, np.ones(w)/w, mode="valid")
                 self.t_ax.plot(xs[w-1:], ma, color=ACC1, lw=2)
         self.t_fig.tight_layout(pad=0.4)
         self.t_cv.draw()
 
     def _redraw_play_chart(self):
+        rewards = list(self.p_rewards)   # snapshot — prevents race condition
         self.p_ax.clear(); self.p_ax.set_facecolor(DARK); self._sax(self.p_ax)
-        xs = list(range(1, len(self.p_rewards)+1))
+        xs = list(range(1, len(rewards)+1))
         if xs:
-            self.p_ax.fill_between(xs, self.p_rewards, alpha=.25, color=ACC2)
-            self.p_ax.plot(xs, self.p_rewards, color=ACC2, lw=1.3)
-            if len(self.p_rewards) >= 5:
-                w  = min(5, len(self.p_rewards))
-                ma = np.convolve(self.p_rewards, np.ones(w)/w, mode="valid")
+            self.p_ax.fill_between(xs, rewards, alpha=.25, color=ACC2)
+            self.p_ax.plot(xs, rewards, color=ACC2, lw=1.3)
+            if len(rewards) >= 5:
+                w  = min(5, len(rewards))
+                ma = np.convolve(rewards, np.ones(w)/w, mode="valid")
                 self.p_ax.plot(xs[w-1:], ma, color=ACC1, lw=2)
         self.p_fig.tight_layout(pad=0.4)
         self.p_cv.draw()
@@ -724,13 +746,46 @@ class App:
     def _toggle_play(self):
         if self.p_running:
             self.p_running = False
-            self.p_btn.config(text=" START PLAY ", bg=ACC3, fg=TEXT)
+            self.p_btn.config(text=" START PLAY ", bg="white", fg="black", activebackground="#dddddd")
             self.sv["p_status"].set("Stopped")
         else:
             self.p_running = True
-            self.p_btn.config(text=" STOP PLAY ", bg=ACC2, fg=TEXT)
+            self.p_btn.config(text=" STOP PLAY ", bg=ACC2, fg="black", activebackground=ACC2)
             self.sv["p_status"].set("Running...")
             threading.Thread(target=self._play_thread, daemon=True).start()
+
+    def _play_best(self):
+        """Load dqn_best.zip — the highest scoring experiment — into the play side."""
+        if self.p_running:
+            self.p_running = False
+            time.sleep(0.15)
+
+        if not os.path.exists(BEST_MODEL):
+            self.p_log.set(
+                f"{BEST_MODEL} not found. "
+                "Run all experiments first via run_experiments.py — "
+                "it saves the best model automatically.")
+            return
+
+        # show which experiment this came from
+        import json as _json
+        info_str = ""
+        if os.path.exists("best_score.json"):
+            with open("best_score.json") as f:
+                bs = _json.load(f)
+            info_str = (f"  ★ Best: Exp #{bs['exp_id']} — {bs['label']}  "
+                        f"last20={bs['last20']}")
+
+        self.p_running = True
+        self.p_btn.config(text=" STOP PLAY ", bg=ACC2, fg="black", activebackground=ACC2)
+        self.sv["p_status"].set("Playing BEST model...")
+        self.p_log.set(f"Loading {BEST_MODEL}{info_str}")
+        self._model_mtime = 0  # force reload
+        threading.Thread(
+            target=self._play_thread_model,
+            args=(BEST_MODEL, False),   # False = don't auto-reload
+            daemon=True
+        ).start()
 
     def _try_reload(self) -> DQN | None:
         try:
@@ -745,20 +800,23 @@ class App:
         return None
 
     def _play_thread(self):
+        self._play_thread_model(CHECKPOINT, auto_reload=True)
+
+    def _play_thread_model(self, model_path: str, auto_reload: bool = True):
         try:
             self.p_log.set(
-                f"Waiting for {CHECKPOINT}...  "
+                f"Waiting for {model_path}...  "
                 "Start training or run train.py in terminal.")
 
-            # wait for checkpoint to exist
-            while not os.path.exists(CHECKPOINT) and self.p_running:
+            # wait for model file to exist
+            while not os.path.exists(model_path) and self.p_running:
                 time.sleep(2)
 
             if not self.p_running:
                 return
 
-            model = DQN.load(CHECKPOINT)
-            self._model_mtime = os.path.getmtime(CHECKPOINT)
+            model = DQN.load(model_path)
+            self._model_mtime = os.path.getmtime(model_path)
 
             # model env — same wrappers as training: (84,84,4) grayscale stacked
             model_env = VecFrameStack(
@@ -769,20 +827,21 @@ class App:
             # display env — raw RGB (210,160,3) for rendering to GUI canvas
             display_env = gym.make(ENV_ID, render_mode="rgb_array")
 
-            self.p_log.set(
-                "GreedyQPolicy active — auto-reloading checkpoint each episode")
+            reload_note = "auto-reloading each episode" if auto_reload else "fixed weights — best model"
+            self.p_log.set(f"GreedyQPolicy active — {reload_note}")
             self.p_ep = 0
             self.p_rewards.clear()
             self.p_steps = 0
 
             while self.p_running:
-                # reload if model updated
-                new_m = self._try_reload()
-                if new_m:
-                    model = new_m
-                    self.p_log.set(
-                        f"Model reloaded at {self.sv['p_reload'].get()} "
-                        f"— ep {self.p_ep}")
+                # only reload if watching live training (not best model)
+                if auto_reload:
+                    new_m = self._try_reload()
+                    if new_m:
+                        model = new_m
+                        self.p_log.set(
+                            f"Model reloaded at {self.sv['p_reload'].get()} "
+                            f"— ep {self.p_ep}")
 
                 obs = model_env.reset()
                 display_env.reset()
@@ -790,9 +849,10 @@ class App:
 
                 while not done and self.p_running:
                     action, _ = model.predict(obs, deterministic=True)
+                    action = np.atleast_1d(action)          # guarantee 1-d
                     obs, rew, dones, _ = model_env.step(action)
-                    done   = bool(dones[0])
-                    ep_r  += float(rew[0])
+                    done   = bool(np.atleast_1d(dones)[0])
+                    ep_r  += float(np.atleast_1d(rew)[0])
                     self.p_steps += 1
 
                     # step display env with same action for rendering
@@ -823,13 +883,13 @@ class App:
             model_env.close()
             display_env.close()
             self.p_running = False
-            self.p_btn.config(text=" START PLAY ", bg=ACC3, fg=TEXT)
+            self.p_btn.config(text=" START PLAY ", bg="white", fg="black", activebackground="#dddddd")
             self.sv["p_status"].set("Stopped")
 
         except Exception as exc:
             self.p_log.set(f"Error: {exc}")
             self.p_running = False
-            self.p_btn.config(text=" START PLAY ", bg=ACC3, fg=TEXT)
+            self.p_btn.config(text=" START PLAY ", bg="white", fg="black", activebackground="#dddddd")
             self.sv["p_status"].set("Error")
 
     # ── RESET ─────────────────────────────────────────────────────────────────
@@ -856,7 +916,7 @@ class App:
         self.p_log.set("Reset.")
         self._ph()
         self.t_btn.config(text=" START TRAINING ", bg=ACC1, fg="#000")
-        self.p_btn.config(text=" START PLAY ",     bg=ACC3, fg=TEXT)
+        self.p_btn.config(text=" START PLAY ", bg="white", fg="black", activebackground="#dddddd")
 
 
 # ──────────────────────────────────────────────────────────────────────────────
