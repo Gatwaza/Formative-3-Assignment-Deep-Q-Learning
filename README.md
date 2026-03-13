@@ -308,18 +308,8 @@ A direct CNN vs MLP comparison would be conducted by second and third member of 
 ### Training in progress — GUI Dashboard (TRAIN + PLAY tab)
 
 ```
-![Training Screenshot](screenshots/training.png)
+![img](screenshots/training.png)
 ![Play Screenshot](screenshots/playing.png)
-```
-
-So your folder would look like:
-```
-Formative-3-Assignment-Deep-Q-Learning/
-├── README.md
-├── screenshots/
-│   ├── training.png
-│   ├── playing.png
-│   └── summary_chart.png
 ```
 
 > **📸 Replace with actual screenshot:** Use `Cmd+Shift+4` on macOS to capture the GUI window during training and add the image here.
