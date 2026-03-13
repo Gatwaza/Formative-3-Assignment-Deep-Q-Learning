@@ -17,7 +17,7 @@ Usage:
     python3 run_experiments.py                      # full run
     python3 run_experiments.py --timesteps 200000   # quick test (~30 min)
     python3 run_experiments.py --start 4 --end 7    # run subset
-    python3 run_experiments.py --member "Alice"     # set your name
+    python3 run_experiments.py --member
     python3 run_experiments.py --reset              # clear checkpoint, start fresh
 """
 

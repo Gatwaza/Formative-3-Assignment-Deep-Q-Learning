@@ -37,9 +37,9 @@ CHECKPOINT   = "dqn_latest.zip"          # play.py watches this file
 ACTION_NAMES = ["NOOP","FIRE","RIGHT","LEFT","RIGHTFIRE","LEFTFIRE"]
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # Callback
-# ──────────────────────────────────────────────────────────────────────────────
+
 class TrainLogger(BaseCallback):
     def __init__(self, log_path: str, save_freq: int = 10_000,
                  print_freq: int = 5):
@@ -87,9 +87,9 @@ class TrainLogger(BaseCallback):
         return True
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # Plotting
-# ──────────────────────────────────────────────────────────────────────────────
+
 def plot_training(rewards, lengths, out_dir, tag):
     if not rewards:
         return
@@ -122,9 +122,9 @@ def plot_training(rewards, lengths, out_dir, tag):
     print(f"  Chart -> {path}")
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # Build vectorized environment
-# ──────────────────────────────────────────────────────────────────────────────
+
 def make_env(n_envs: int):
     """
     make_atari_env applies: NoopReset, MaxAndSkip, EpisodicLife,
@@ -144,9 +144,9 @@ def make_env(n_envs: int):
     return env
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # Main
-# ──────────────────────────────────────────────────────────────────────────────
+
 def train(args):
     tag     = datetime.now().strftime("%Y%m%d_%H%M%S")
     out_dir = os.path.join("logs", tag)
@@ -226,8 +226,7 @@ def train(args):
     print(f"  Logged -> {fp}\n")
     env.close()
 
-
-# ──────────────────────────────────────────────────────────────────────────────
+# --
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
         description="Vectorized DQN training on ALE/DemonAttack-v5",
