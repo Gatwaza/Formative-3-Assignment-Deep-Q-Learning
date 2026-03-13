@@ -308,30 +308,18 @@ A direct CNN vs MLP comparison would be conducted by second and third member of 
 ### Training in progress — GUI Dashboard (TRAIN + PLAY tab)
 
 ```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  DEMON ATTACK  |  DQN Dashboard              Train + Play Simultaneously │
-├──────────────────────── TOP CONTROLS ────────────────────────────────────┤
-│  POLICY CnnPolicy | LR 0.0001 | GAMMA 0.99 | BATCH 32 | N_ENVS 4       │
-│  EPS 1.0/0.01/0.10 | STEPS 1000000   [START TRAINING] [START PLAY]      │
-├──────────────────────────────────┬───────────────────────────────────────┤
-│  LEFT — TRAINING                 │  RIGHT — LIVE PLAY                   │
-│                                  │                                       │
-│  STATUS  EP    SCORE  BEST SPS   │  STATUS  EP  SCORE  BEST  ACTION     │
-│  Training 142  380    510  1240  │  Running 23  290    510   FIRE       │
-│                                  │                                       │
-│  ╭─ TRAINING REWARD ───────────╮ │  ╭─ AGENT LIVE FEED ─────────────╮  │
-│  │  ▁▂▂▃▄▄▅▅▆▆▇▇██            │ │  │                               │  │
-│  │         moving avg ━━━━━━━ │ │  │   [ DemonAttack gameplay ]    │  │
-│  ╰─────────────────────────────╯ │  │   [ demons incoming  💥🚀  ] │  │
-│                                  │  │   [ agent firing right     ] │  │
-│  ████████████░░░░░  Progress 62% │  ╰───────────────────────────────╯  │
-│  Last checkpoint: 14:32:08       │                                       │
-│                                  │  ╭─ EVALUATION SCORES ────────────╮  │
-│  CURRENT HYPERPARAMETERS         │  │  ▁▂▃▅▆▅▇▇██                   │  │
-│  policy=CnnPolicy lr=0.0001      │  │         avg ━━━━━━━━━━━       │  │
-│  gamma=0.99 batch=32 n_envs=4    │  ╰───────────────────────────────╯  │
-│                                  │  Reloaded: 14:32:09                  │
-└──────────────────────────────────┴───────────────────────────────────────┘
+![Training Screenshot](screenshots/training.png)
+![Play Screenshot](screenshots/playing.png)
+```
+
+So your folder would look like:
+```
+Formative-3-Assignment-Deep-Q-Learning/
+├── README.md
+├── screenshots/
+│   ├── training.png
+│   ├── playing.png
+│   └── summary_chart.png
 ```
 
 > **📸 Replace with actual screenshot:** Use `Cmd+Shift+4` on macOS to capture the GUI window during training and add the image here.
