@@ -48,10 +48,8 @@ CHECKPOINT  = "dqn_latest.zip"
 PROGRESS_F  = "experiments_checkpoint.json"
 CSV_PATH    = "hyperparameter_experiments.csv"
 
-# ──────────────────────────────────────────────────────────────────────────────
-# ← CHANGE THIS to your name before running
+# name to log with csv
 MEMBER_NAME = "Gatwaza"
-# ──────────────────────────────────────────────────────────────────────────────
 
 EXPERIMENTS = [
     {
@@ -117,9 +115,7 @@ EXPERIMENTS = [
 ]
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Checkpoint / resume helpers
-# ──────────────────────────────────────────────────────────────────────────────
 def load_progress() -> dict:
     if os.path.exists(PROGRESS_F):
         with open(PROGRESS_F) as f:
@@ -139,9 +135,7 @@ def mark_done(progress: dict, exp_id: int, result: dict):
     save_progress(progress)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Vectorized environment builder
-# ──────────────────────────────────────────────────────────────────────────────
 def make_env(n_envs: int):
     vec_cls = DummyVecEnv
     if n_envs > 1 and platform.system() != "Darwin":
@@ -151,9 +145,7 @@ def make_env(n_envs: int):
     return VecFrameStack(env, n_stack=4)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Callback
-# ──────────────────────────────────────────────────────────────────────────────
+# Callback to track rewards, save checkpoints, and print progress
 class ExpCallback(BaseCallback):
     def __init__(self, total_steps: int, save_freq: int = 10_000):
         super().__init__()
@@ -179,9 +171,8 @@ class ExpCallback(BaseCallback):
         return self.num_timesteps / max(time.time()-self._start, 1)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Chart helpers
-# ──────────────────────────────────────────────────────────────────────────────
+
 def save_exp_chart(rewards, exp_id, label, out_dir):
     if not rewards:
         return None
@@ -242,9 +233,8 @@ def save_summary_chart(results: list, out_dir: str):
     print(f"\n  Summary chart -> {path}")
 
 
-# ──────────────────────────────────────────────────────────────────────────────
 # Run one experiment
-# ──────────────────────────────────────────────────────────────────────────────
+
 def run_one(exp: dict, timesteps: int, n_envs: int,
             out_dir: str, member: str) -> dict:
     sep = "─" * 62
@@ -326,12 +316,12 @@ def run_one(exp: dict, timesteps: int, n_envs: int,
             "elapsed": round(elapsed, 1)}
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # Main
-# ──────────────────────────────────────────────────────────────────────────────
+
 def main():
     p = argparse.ArgumentParser(
-        description="Auto-run 10 DemonAttack-v5 DQN experiments (resumable)",
+        description="10 DemonAttack-v5 DQN experiments",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     p.add_argument("--timesteps", type=int,   default=500_000,
@@ -366,7 +356,7 @@ def main():
                     and args.start <= e["id"] <= args.end]
 
     print("\n" + "=" * 62)
-    print("  DEMON ATTACK  |  AUTO EXPERIMENTS  (Resumable + Vectorized)")
+    print("  DEMON ATTACK  |  EXPERIMENTS RUNNER")
     print("=" * 62)
     print(f"  Member      : {args.member}")
     print(f"  Env         : {ENV_ID}")
@@ -376,7 +366,7 @@ def main():
     print(f"  To run      : {len(exps)} experiments")
     print(f"  Already done: {len(already_done)} — {[e['id'] for e in already_done]}")
     print(f"  Checkpoint  : {PROGRESS_F}  (resume if crash)")
-    print(f"  Live play   : python3 play.py  (in another terminal)")
+    print(f"  Live play   : python3 play.py")
     print("=" * 62)
 
     if not exps:
