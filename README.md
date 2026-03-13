@@ -307,38 +307,25 @@ A direct CNN vs MLP comparison would be conducted by second and third member of 
 
 ### Training in progress — GUI Dashboard (TRAIN + PLAY tab)
 
-```
-![img](screenshots/training.png)
-![Play Screenshot](screenshots/playing.png)
-```
+![Training in progress](screenshots/training.png)
 
-> **📸 Replace with actual screenshot:** Use `Cmd+Shift+4` on macOS to capture the GUI window during training and add the image here.
+*Left side: live reward chart, progress bar, steps-per-second, current hyperparameters. Right side: agent playing in real time, auto-reloading the model every episode as training saves checkpoints every 10k steps.*
 
 ---
 
 ### Agent playing after full training — play.py
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│  DEMON ATTACK  |  DQN Live Play        GreedyQPolicy (argmax)│
-├────────────────────────────────────┬─────────────────────────┤
-│                                    │  EPISODE    SCORE       │
-│                                    │    47         640       │
-│  ┌──────────────────────────────┐  │                         │
-│  │  👾 👾 👾   👾 👾 👾 👾     │  │  BEST       STEPS       │
-│  │       👾 👾 👾               │  │   890       12,430      │
-│  │          💥  ↓↓              │  │                         │
-│  │                              │  │  ▁▃▅▆▇▆▇▇█             │
-│  │    ══ bunker ══ bunker ══   │  │  episode scores         │
-│  │             🚀               │  │                         │
-│  └──────────────────────────────┘  │  GREEDYQPOLICY          │
-│                                    │  action=argmax Q(s,a)   │
-│  Last action: RIGHTFIRE            │  deterministic=True     │
-│                                    │  epsilon=0              │
-└────────────────────────────────────┴─────────────────────────┘
-```
+![Agent playing](screenshots/playing.png)
 
-> **📸 Replace with actual screenshot:** Capture `play.py` window after training a model for 1M+ steps showing a high score episode.
+*GreedyQPolicy — action = argmax Q(s,a), deterministic=True, epsilon=0. Agent fires at the highest-value target on every frame with no random exploration.*
+
+---
+
+### Experiment summary chart
+
+![Experiment summary](screenshots/summary_chart.png)
+
+*Grouped bar chart comparing mean score, best score, and last-20-episode mean across all 10 hyperparameter experiments. Copy the auto-generated file from `logs/experiments_<timestamp>/summary_all_experiments.png` into the `screenshots/` folder.*
 
 ---
 

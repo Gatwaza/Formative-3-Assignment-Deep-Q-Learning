@@ -2,3 +2,4 @@ exp_id,label,member,env,policy,lr,gamma,batch_size,eps_start,eps_end,eps_decay,n
 1,Baseline,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.99,32,1.0,0.01,0.1,4,500000,1321,376.8,2475.0,468.0,3581.2,"n_ep=1321, mean=376.8, best=2475.0, last20=468.0. Balanced default — reference point for all other runs"
 2,High LR,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.001,0.99,32,1.0,0.01,0.1,4,500000,1220,297.6,2070.0,525.8,3740.8,"n_ep=1220, mean=297.6, best=2070.0, last20=525.8. 10x higher lr — faster early gains but may oscillate"
 3,Low LR,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,1e-05,0.99,32,1.0,0.01,0.1,4,500000,1365,376.3,2355.0,366.5,3593.1,"n_ep=1365, mean=376.3, best=2355.0, last20=366.5. Very slow convergence — low reward expected"
+4,Low Gamma,Gatwaza,ALE/DemonAttack-v5,CnnPolicy,0.0001,0.9,32,1.0,0.01,0.1,4,500000,1792,385.2,3620.0,792.0,3381.1,"n_ep=1792, mean=385.2, best=3620.0, last20=792.0. Short-sighted agent — prefers immediate kills over survival"
