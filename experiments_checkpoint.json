@@ -3,7 +3,10 @@
     1,
     2,
     3,
-    4
+    4,
+    5,
+    6,
+    7
   ],
   "results": {
     "1": {
@@ -37,6 +40,30 @@
       "best": 3620.0,
       "last20": 792.0,
       "elapsed": 3381.1
+    },
+    "5": {
+      "id": 5,
+      "label": "High Gamma",
+      "mean": 302.8,
+      "best": 3110.0,
+      "last20": 288.5,
+      "elapsed": 3480.6
+    },
+    "6": {
+      "id": 6,
+      "label": "Large Batch",
+      "mean": 856.5,
+      "best": 7330.0,
+      "last20": 1566.8,
+      "elapsed": 8728.8
+    },
+    "7": {
+      "id": 7,
+      "label": "Small Batch",
+      "mean": 322.8,
+      "best": 2000.0,
+      "last20": 351.8,
+      "elapsed": 2324.2
     }
   }
 }
