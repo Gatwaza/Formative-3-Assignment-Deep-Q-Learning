@@ -7,7 +7,9 @@
     5,
     6,
     7,
-    8
+    8,
+    9,
+    10
   ],
   "results": {
     "1": {
@@ -73,6 +75,22 @@
       "best": 2505.0,
       "last20": 530.2,
       "elapsed": 3150.4
+    },
+    "9": {
+      "id": 9,
+      "label": "Slow Epsilon Decay",
+      "mean": 311.1,
+      "best": 3130.0,
+      "last20": 724.0,
+      "elapsed": 3121.2
+    },
+    "10": {
+      "id": 10,
+      "label": "Best Guess Combined",
+      "mean": 862.9,
+      "best": 5000.0,
+      "last20": 1348.8,
+      "elapsed": 4810.6
     }
   }
 }
