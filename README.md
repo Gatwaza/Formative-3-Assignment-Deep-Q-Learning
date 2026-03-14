@@ -136,10 +136,15 @@ All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime:
 
 ## 7. Screenshots
 
+
 ### Training in Progress
+<video src="https://github.com/Gatwaza/Formative-3-Assignment-Deep-Q-Learning/releases/download/v1.0/training.mov" controls width="800"></video>
 
+### Agent Playing — Experiment Selector
+
+<video src="https://github.com/Gatwaza/Formative-3-Assignment-Deep-Q-Learning/releases/download/v1.0/playing.mov" controls width="800"></video>
 ![Training in progress](screenshots/training vid.mov)
-
+/
 *Simultaneous training (left) and live agent play (right) via `atari_dqn_gui.py`. Left shows reward chart and progress bar; right shows live game feed with auto-reloading checkpoint.*
 
 ---
