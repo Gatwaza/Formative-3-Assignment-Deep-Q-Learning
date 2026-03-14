@@ -161,7 +161,7 @@ All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime:
 
 ### Experiment Summary Chart
 
-![Experiment summary](screenshots/summary_chart.gif)
+![Experiment summary](screenshots/summary_chart.png)
 
 *Grouped bar chart comparing mean score, best score, and last-20-episode mean across all 10 experiments. Best experiment (#6 Large Batch) clearly dominates with last-20 mean of 1566.8.*
 
