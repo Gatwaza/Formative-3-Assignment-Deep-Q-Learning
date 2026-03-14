@@ -140,7 +140,6 @@ All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime:
 > ```bash
 > ffmpeg -i training.mov -vf "fps=15,scale=640:-1" -t 15 screenshots/training.gif
 > ffmpeg -i playing.mov  -vf "fps=15,scale=640:-1" -t 15 screenshots/playing.gif
-> ffmpeg -i summary.mov  -vf "fps=15,scale=640:-1" -t 15 screenshots/summary.gif
 > ```
 
 ### Training in Progress
