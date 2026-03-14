@@ -1,6 +1,6 @@
 # Formative 3 — Deep Q-Learning on ALE/DemonAttack-v5
 
-**Student:** Gatwaza  
+**Group member:** Jean Robert Gatwaza
 **Environment:** `ALE/DemonAttack-v5`  
 **Algorithm:** Deep Q-Network (DQN) — Stable Baselines 3  
 **Policy:** `CnnPolicy` (Convolutional Neural Network) — all 10 experiments  
@@ -44,7 +44,7 @@ print('OK — obs shape:', obs.shape); env.close()"
 | File | Purpose |
 |---|---|
 | `train.py` | Single training run with CLI flags |
-| `run_experiments.py` | Runs all 10 experiments automatically, resumable on crash |
+| `run_experiments.py` | Runs all 10 experiments at once, resumable on demand |
 | `play.py` | Evaluation GUI — experiment selector, live feed, comparison chart |
 | `dqn_best.zip` | Best performing model (Exp 6 — Large Batch) |
 | `dqn_latest.zip` | Most recent checkpoint |
@@ -57,7 +57,7 @@ print('OK — obs shape:', obs.shape); env.close()"
 
 **Run all 10 experiments:**
 ```bash
-python3 run_experiments.py --timesteps 500000 --member "Gatwaza"
+python3 run_experiments.py --timesteps 500000
 ```
 
 **Single custom run:**
@@ -76,7 +76,7 @@ python3 play.py --model dqn_best.zip
 
 ## 5. Hyperparameter Experiments — Gatwaza
 
-All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime: **665.3 minutes**.
+All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime: **665.3 minutes Almost half a day nonn-stop**.
 
 ### 5.1 Results
 

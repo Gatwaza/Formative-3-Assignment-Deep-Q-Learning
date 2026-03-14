@@ -1,7 +1,7 @@
 """
 play.py — ALE/DemonAttack-v5
-─────────────────────────────
-Play GUI with experiment selector — choose any of the 10 trained
+
+you can play GUI with experiment selector — choose any of the 10 trained
 experiment models and switch between them live to compare performance.
 
 Features:
@@ -64,9 +64,9 @@ EXP_COLORS = [
 ]
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # Helpers
-# ──────────────────────────────────────────────────────────────────────────────
+
 def discover_models() -> list[dict]:
     """
     Scan working directory and logs/ for all saved experiment models.
@@ -111,9 +111,9 @@ def discover_models() -> list[dict]:
     ]
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+
 # GUI
-# ──────────────────────────────────────────────────────────────────────────────
+
 class PlayGUI:
     def __init__(self, root: tk.Tk, args):
         self.root    = root
@@ -142,7 +142,7 @@ class PlayGUI:
         self._build()
         root.after(28, self._poll_frame)
 
-    # ── build ─────────────────────────────────────────────────────────────────
+    # build
     def _build(self):
         # header
         hdr = tk.Frame(self.root, bg=PANEL, height=52)
@@ -156,7 +156,7 @@ class PlayGUI:
         tk.Label(hdr, text="GreedyQPolicy  |  argmax Q(s,a)",
                  font=FT, bg=PANEL, fg=ACC1).pack(side=tk.RIGHT, padx=20)
 
-        # ── selector bar ──────────────────────────────────────────────────────
+        # selector bar
         sel = tk.Frame(self.root, bg=CARD, height=46)
         sel.pack(fill=tk.X)
         sel.pack_propagate(False)
@@ -223,11 +223,11 @@ class PlayGUI:
                                 font=FT, bg=CARD, fg=MUTED)
         self.cur_lbl.pack(side=tk.RIGHT, padx=16)
 
-        # ── body ──────────────────────────────────────────────────────────────
+        # body
         body = tk.Frame(self.root, bg=BG)
         body.pack(fill=tk.BOTH, expand=True, padx=8, pady=6)
 
-        # ── LEFT: game feed ───────────────────────────────────────────────────
+        # LEFT: game feed
         left = tk.Frame(body, bg=BG)
         left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
@@ -282,7 +282,7 @@ class PlayGUI:
         # divider
         tk.Frame(body, bg="#1a1a40", width=2).pack(side=tk.LEFT, fill=tk.Y, padx=6)
 
-        # ── RIGHT: comparison ─────────────────────────────────────────────────
+        # RIGHT: comparison
         right = tk.Frame(body, bg=BG, width=380)
         right.pack(side=tk.RIGHT, fill=tk.Y)
         right.pack_propagate(False)
@@ -316,7 +316,7 @@ class PlayGUI:
                                   state=tk.DISABLED, bd=4)
         self.score_text.pack(fill=tk.X, padx=6, pady=(0,6))
 
-    # ── helpers ───────────────────────────────────────────────────────────────
+    # helpers
     def _ph(self):
         self.canvas.delete("all")
         self.canvas.create_text(400, 200, fill=MUTED,
@@ -349,7 +349,7 @@ class PlayGUI:
             pass
         self.root.after(28, self._poll_frame)
 
-    # ── charts ────────────────────────────────────────────────────────────────
+    # charts
     def _redraw_ep_chart(self):
         rewards = list(self.ep_rewards)
         self.ep_ax.clear(); self.ep_ax.set_facecolor(DARK); self._sax(self.ep_ax)
@@ -432,7 +432,7 @@ class PlayGUI:
         idx = hash(label) % len(EXP_COLORS)
         return EXP_COLORS[idx]
 
-    # ── controls ──────────────────────────────────────────────────────────────
+    # controls
     def _refresh_models(self):
         self.models       = discover_models()
         self.model_labels = [m["label"] for m in self.models]
@@ -503,7 +503,7 @@ class PlayGUI:
                             activebackground="#dddddd", activeforeground="black")
         self.status_var.set("Scores reset.")
 
-    # ── play thread ───────────────────────────────────────────────────────────
+    # play thread
     def _play_thread(self, initial_path: str, initial_label: str):
         try:
             current_path  = initial_path
@@ -592,7 +592,7 @@ class PlayGUI:
             self.run_btn.config(text=" START ", bg="white", fg="black", font=("Courier",9,"bold"), activebackground="#dddddd", activeforeground="black")
 
 
-# ──────────────────────────────────────────────────────────────────────────────
+# main
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
         description="Play any experiment model on DemonAttack-v5")

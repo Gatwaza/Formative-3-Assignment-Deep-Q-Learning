@@ -1,9 +1,9 @@
 """
 run_experiments.py — ALE/DemonAttack-v5
-────────────────────────────────────────
-Runs all 10 hyperparameter experiments automatically.
 
-RESUME:   If it crashes, just re-run the same command.
+I'll be running all 10 hyperparameter experiments at once.
+
+RESUME:   If it crashes, will just re-run the same command.
           Completed experiments are saved to experiments_checkpoint.json
           and automatically skipped on restart.
 
@@ -15,7 +15,7 @@ LIVE:     Saves dqn_latest.zip every 10k steps.
 
 Usage:
     python3 run_experiments.py                      # full run
-    python3 run_experiments.py --timesteps 200000   # quick test (~30 min)
+    python3 run_experiments.py --timesteps 200000   # quick test
     python3 run_experiments.py --start 4 --end 7    # run subset
     python3 run_experiments.py --member
     python3 run_experiments.py --reset              # clear checkpoint, start fresh

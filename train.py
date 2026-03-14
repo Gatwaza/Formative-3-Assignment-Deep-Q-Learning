@@ -1,9 +1,9 @@
 """
 train.py — ALE/DemonAttack-v5
-──────────────────────────────
-Vectorized DQN training using make_atari_env + VecFrameStack.
-Uses n_envs parallel environments for significant speedup.
-Saves a checkpoint every --save-freq steps so play.py can load it live.
+
+I vectorized DQN training using make_atari_env + VecFrameStack.
+Used n_envs parallel environments for significant speedup.
+Saving a checkpoint every --save-freq steps so play.py can load it live.
 
 Usage:
     python3 train.py
@@ -33,7 +33,7 @@ from stable_baselines3.common.vec_env import VecFrameStack, SubprocVecEnv, Dummy
 gym.register_envs(ale_py)
 
 ENV_ID       = "ALE/DemonAttack-v5"
-CHECKPOINT   = "dqn_latest.zip"          # play.py watches this file
+CHECKPOINT   = "dqn_latest.zip"          # direct play.py to watch this file
 ACTION_NAMES = ["NOOP","FIRE","RIGHT","LEFT","RIGHTFIRE","LEFTFIRE"]
 
 
@@ -86,8 +86,6 @@ class TrainLogger(BaseCallback):
                           f"best={max(self.ep_rewards):>7.1f}")
         return True
 
-
-
 # Plotting
 
 def plot_training(rewards, lengths, out_dir, tag):
@@ -121,8 +119,6 @@ def plot_training(rewards, lengths, out_dir, tag):
     plt.close(fig)
     print(f"  Chart -> {path}")
 
-
-
 # Build vectorized environment
 
 def make_env(n_envs: int):
@@ -132,7 +128,7 @@ def make_env(n_envs: int):
     VecFrameStack stacks 4 consecutive frames → obs: (84,84,4).
     This shrinks memory ~10x vs raw (210,160,3) and speeds up CNN.
     """
-    # macOS Python 3.12 uses 'spawn' by default — SubprocVecEnv works
+    # since I use macOS Python 3.12 uses 'spawn' by default — SubprocVecEnv works
     # but requires the guard below. DummyVecEnv is safer for GUI usage.
     vec_cls = DummyVecEnv
     if n_envs > 1 and platform.system() != "Darwin":
@@ -142,8 +138,6 @@ def make_env(n_envs: int):
                          vec_env_cls=vec_cls, seed=42)
     env = VecFrameStack(env, n_stack=4)
     return env
-
-
 
 # Main
 
@@ -176,7 +170,7 @@ def train(args):
         exploration_initial_eps = args.eps_start,
         exploration_final_eps   = args.eps_end,
         exploration_fraction    = args.eps_decay,
-        buffer_size             = 50_000,    # safe: 84x84x4 frames are tiny
+        buffer_size             = 50_000,
         learning_starts         = 5_000,
         target_update_interval  = 1_000,
         train_freq              = 4,
