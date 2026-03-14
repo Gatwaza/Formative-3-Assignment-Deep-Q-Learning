@@ -138,7 +138,7 @@ All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime:
 
 ### Training in Progress
 
-![Training in progress](screenshots/training.png)
+![Training in progress](screenshots/training vid.mov)
 
 *Simultaneous training (left) and live agent play (right) via `atari_dqn_gui.py`. Left shows reward chart and progress bar; right shows live game feed with auto-reloading checkpoint.*
 
@@ -176,4 +176,4 @@ FireReset → ClipReward → WarpFrame(84,84) → VecFrameStack(4) → (84,84,4)
 
 ---
 
-*Formative 3 — Deep Q-Learning | Student: Gatwaza | ALE/DemonAttack-v5 | Stable Baselines 3*
+*Formative 3 — Deep Q-Learning | ALE/DemonAttack-v5 | Stable Baselines 3*
