@@ -1,84 +1,67 @@
-# Formative 3 — Deep Q-Learning on ALE/DemonAttack-v5
+# Deep Q-Learning — ALE/DemonAttack-v5
 
-**Group member:** Jean Robert Gatwaza
+**Member:** Jean Robert Gatwaza  
 **Environment:** `ALE/DemonAttack-v5`  
-**Algorithm:** Deep Q-Network (DQN) — Stable Baselines 3  
-**Policy:** `CnnPolicy` (Convolutional Neural Network) — all 10 experiments  
+**Algorithm:** DQN — Stable Baselines 3  
+**Policy:** `CnnPolicy` — all 10 experiments  
 
 ---
 
-## 1. Environment
+## Environment
 
 | Property | Value |
 |---|---|
-| Environment ID | `ALE/DemonAttack-v5` |
-| Action Space | `Discrete(6)` — NOOP, FIRE, RIGHT, LEFT, RIGHTFIRE, LEFTFIRE |
-| Raw Observation | `Box(0, 255, (210, 160, 3), uint8)` |
-| Preprocessed Input | `(84, 84, 4)` — grayscale + 4 stacked frames via `VecFrameStack` |
-| Frameskip | 4 |
-| Repeat Action Probability | 0.25 |
-
-**Reward:** Points per demon destroyed. Agent begins with 3 bunkers (max 6). Each hit destroys one bunker; game ends on the next hit after all bunkers are lost.
+| ID | `ALE/DemonAttack-v5` |
+| Actions | `Discrete(6)` — NOOP, FIRE, RIGHT, LEFT, RIGHTFIRE, LEFTFIRE |
+| Raw Obs | `Box(0, 255, (210, 160, 3), uint8)` |
+| Preprocessed | `(84, 84, 4)` grayscale + 4 stacked frames |
+| Frameskip | 4 — Repeat Action Prob: 0.25 |
 
 ---
 
-## 2. Installation
+## Installation
 
 ```bash
 pip3 install stable-baselines3 "gymnasium[atari,accept-rom-license]" \
-             ale-py autorom pillow matplotlib opencv-python tensorboard
+             ale-py autorom pillow matplotlib opencv-python
 AutoROM --accept-license
 ```
 
-Verify:
-```bash
-python3 -c "import ale_py, gymnasium as gym; gym.register_envs(ale_py); \
-env = gym.make('ALE/DemonAttack-v5'); obs,_=env.reset(); \
-print('OK — obs shape:', obs.shape); env.close()"
-```
-
 ---
 
-## 3. Project Files
+## Files
 
 | File | Purpose |
 |---|---|
-| `train.py` | Single training run with CLI flags |
-| `run_experiments.py` | Runs all 10 experiments at once, resumable on demand |
-| `play.py` | Evaluation GUI — experiment selector, live feed, comparison chart |
-| `dqn_best.zip` | Best performing model (Exp 6 — Large Batch) |
-| `dqn_latest.zip` | Most recent checkpoint |
-| `hyperparameter_experiments.csv` | Full results log |
-| `logs/` | Per-experiment reward charts and models |
+| `train.py` | Single training run |
+| `run_experiments.py` | All 10 experiments — auto-resumable |
+| `play.py` | Live evaluation GUI with experiment selector |
+| `dqn_best.zip` | Best model — Exp 6 Large Batch |
+| `hyperparameter_experiments.csv` | Full results |
 
 ---
 
-## 4. How to Run
+## How to Run
 
-**Run all 10 experiments:**
 ```bash
+# All 10 experiments
+python3 run_experiments.py --timesteps 500000
+
+# Single run
+python3 train.py --lr 0.0001 --gamma 0.99 --batch 32 --timesteps 1000000
+
+# Play and compare
+python3 play.py --model dqn_best.zip
+
+# Resume after crash — skips completed experiments automatically
 python3 run_experiments.py --timesteps 500000
 ```
 
-**Single custom run:**
-```bash
-python3 train.py --lr 0.0001 --gamma 0.99 --batch 32 --n-envs 4 --timesteps 1000000
-```
-
-**Play and compare experiments:**
-```bash
-python3 play.py --model dqn_best.zip
-```
-
-**Crash recovery** — re-run the same command; completed experiments are skipped automatically via `experiments_checkpoint.json`.
-
 ---
 
-## 5. Hyperparameter Experiments — Gatwaza
+## Experiments — Gatwaza
 
-All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime: **665.3 minutes Almost half a day nonn-stop**.
-
-### 5.1 Results
+`CnnPolicy` · `n_envs=4` · `500,000` timesteps · Total runtime: **665.3 min**
 
 | # | Label | lr | gamma | batch | eps_end | eps_decay | Mean | Best | Last-20 |
 |---|---|---|---|---|---|---|---|---|---|
@@ -89,58 +72,72 @@ All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime:
 | 5 | High Gamma | 0.0001 | 0.999 | 32 | 0.01 | 0.10 | 302.8 | 3110.0 | 288.5 |
 | 6 | **Large Batch ★** | 0.0001 | 0.99 | **128** | 0.01 | 0.10 | **856.5** | **7330.0** | **1566.8** |
 | 7 | Small Batch | 0.0001 | 0.99 | 16 | 0.01 | 0.10 | 322.8 | 2000.0 | 351.8 |
-| 8 | High Eps End | 0.0001 | 0.99 | 32 | **0.10** | 0.10 | 278.9 | 2505.0 | 530.2 |
-| 9 | Slow Eps Decay | 0.0001 | 0.99 | 32 | 0.01 | **0.50** | 311.1 | 3130.0 | 724.0 |
+| 8 | High Eps End | 0.0001 | 0.99 | 32 | 0.10 | 0.10 | 278.9 | 2505.0 | 530.2 |
+| 9 | Slow Eps Decay | 0.0001 | 0.99 | 32 | 0.01 | 0.50 | 311.1 | 3130.0 | 724.0 |
 | 10 | Best Guess | 0.0005 | 0.995 | 64 | 0.01 | 0.15 | 862.9 | 5000.0 | 1348.8 |
 
-**★ Best experiment: #6 — Large Batch (last-20 mean = 1566.8)**
+**★ Best: Exp 6 — Large Batch · last-20 = 1566.8**
 
-### 5.2 Observations
+### Observations
 
-**Exp 1 — Baseline:** Reference point. Consistent learning with moderate scores. last-20 (468) exceeds mean (376.8) confirming active improvement at end of training.
+**Exp 1 — Baseline:** Stable reference. last-20 (468) > mean (376.8) confirms the agent was still improving at end of training.
 
-**Exp 2 — High LR:** Low overall mean (297.6) indicates early instability from large gradient steps, but last-20 (525.8) recovers above baseline, suggesting eventual convergence.
+**Exp 2 — High LR:** Early instability lowers overall mean (297.6), but last-20 (525.8) recovers above baseline — convergence eventually stabilised.
 
-**Exp 3 — Low LR:** last-20 (366.5) ≈ mean (376.3), indicating the agent never meaningfully improved. Learning rate too small for useful weight updates within 500k steps.
+**Exp 3 — Low LR:** last-20 ≈ mean — flat curve. lr=1e-5 produces too-small weight updates to converge within 500k steps.
 
-**Exp 4 — Low Gamma:** Contrary to hypothesis, gamma=0.90 outperformed baseline (last-20=792.0). Short-sighted reward maximisation aligns with DemonAttack's immediate-firing scoring structure.
+**Exp 4 — Low Gamma:** Outperformed baseline (last-20=792.0). Short-sighted maximisation suits DemonAttack's immediate wave-based scoring — contrary to hypothesis.
 
-**Exp 5 — High Gamma:** last-20 (288.5) < mean (302.8) — agent regressed during training. gamma=0.999 requires far more timesteps to form coherent long-term strategies; 500k is insufficient.
+**Exp 5 — High Gamma:** last-20 (288.5) < mean (302.8) — agent regressed. gamma=0.999 needs far more timesteps to form long-term strategies.
 
-**Exp 6 — Large Batch ★:** Dominant result. batch=128 produced last-20=1566.8 (3.3× baseline), best=7330.0, and the lowest episode count (1146), indicating longest survival. Smoother gradient estimates from larger batches are highly beneficial for pixel-based spatial targeting.
+**Exp 6 — Large Batch ★:** Dominant. batch=128 → last-20=1566.8 (3.3× baseline), best=7330.0. Smoother gradients are highly beneficial for pixel-based spatial targeting.
 
-**Exp 7 — Small Batch:** batch=16 produced the noisiest gradients. last-20 (351.8) below baseline, confirming that insufficient batch diversity harms learning stability.
+**Exp 7 — Small Batch:** batch=16 produces noisy gradients. last-20 below baseline — insufficient sample diversity harms stability.
 
-**Exp 8 — High Eps End:** Maintaining 10% random exploration permanently (eps_end=0.10) reduces exploitation of learned policy, limiting last-20 to 530.2 despite reasonable best score (2505.0).
+**Exp 8 — High Eps End:** 10% permanent exploration limits exploitation. Lowest mean among middle experiments (278.9).
 
-**Exp 9 — Slow Eps Decay:** eps_decay=0.50 delays exploitation until the second half of training. last-20=724.0 — better than baseline, suggesting broader exploration improved strategy diversity before converging.
+**Exp 9 — Slow Eps Decay:** Broader exploration before convergence improved last-20 (724.0) above baseline.
 
-**Exp 10 — Best Guess Combined:** Second-best overall (last-20=1348.8, best=5000.0). Moderate lr increase (0.0005) combined with batch=64 and gamma=0.995 produced strong results, validating combined tuning as an effective approach.
+**Exp 10 — Best Guess:** Second-best (last-20=1348.8, best=5000.0). Combined tuning validates multi-parameter optimisation.
 
-### 5.3 Key Findings
+### Key Findings
 
-1. **Batch size is the most impactful hyperparameter** — batch=128 outperformed all others by a significant margin.
-2. **Low gamma (0.90) suits DemonAttack** — immediate reward maximisation matches the game's wave-based scoring.
-3. **High gamma (0.999) requires more timesteps** — long-term planning cannot be learned in 500k steps.
-4. **Training duration matters** — the GUI run with identical baseline settings but 1M steps achieved last-20=1100 vs 468 at 500k, demonstrating that all experiments would benefit from extended training.
+1. **Batch size was the most impactful hyperparameter** — batch=128 dominated all others.
+2. **Low gamma suits DemonAttack** — immediate rewards align with wave-based scoring.
+3. **High gamma needs more timesteps** — long-term planning cannot form in 500k steps.
+4. **Training duration matters** — same baseline at 1M steps achieved last-20=1100 vs 468 at 500k.
 
 ---
 
-## 6. Policy: CnnPolicy vs MlpPolicy
+## Policy
 
-`CnnPolicy` was used exclusively across all 10 experiments. The observation space after preprocessing is `(84, 84, 4)` — a spatial image tensor. A CNN learns spatial filters to detect demons, bullets, and the player across pixel positions, which is essential for accurate targeting. An MLP would flatten this into a 28,224-dimensional vector, losing all spatial relationships. All foundational DQN Atari papers (Mnih et al., 2013, 2015) establish CNN as the required architecture for pixel-based environments.
+`CnnPolicy` exclusively. Preprocessed obs `(84,84,4)` is a spatial tensor — CNNs learn positional filters to detect demons, bullets, and the player. Flattening to 28,224 values loses all spatial relationships. CNN is the established architecture for Atari pixel environments (Mnih et al., 2013, 2015).
 
-`MlpPolicy` is available via `--policy MlpPolicy` for comparison but was not used in the core experiments to maintain single-variable isolation per experiment. A dedicated CNN vs MLP comparison is assigned to a separate group member.
+---
+
+## Demo
+
+### Training
+
+![Training](screenshots/training.gif)
+
+*Split-screen: training reward chart (left) + live agent feed auto-reloading every 10k steps (right).*
+
+### Agent Playing
+
+![Playing](screenshots/playing.gif)
+
+*Experiment selector GUI — switch between trained models live, comparison chart updates each episode.*
+
+### Summary Chart
+
+![Summary](screenshots/summary_chart.png)
+
+*All 10 experiments compared. Exp 6 (Large Batch) dominates clearly.*
 
 ---
 
 ## 7. Demo Videos
-
-> Convert `.mov` recordings to GIF before pushing:
-> ```bash
-> ffmpeg -i training.mov -vf "fps=15,scale=640:-1" -t 15 screenshots/training.gif
-> ffmpeg -i playing.mov  -vf "fps=15,scale=640:-1" -t 15 screenshots/playing.gif
-> ```
 
 ### Training in Progress
 
@@ -165,21 +162,13 @@ All experiments use `CnnPolicy`, `n_envs=4`, `500,000` timesteps. Total runtime:
 *Grouped bar chart comparing mean score, best score, and last-20-episode mean across all 10 experiments. Best experiment (#6 Large Batch) clearly dominates with last-20 mean of 1566.8.*
 
 ---
+## Notes
 
-## 8. Considerations
-
-**Memory:** A `UserWarning` about replay buffer size may appear. This is a worst-case estimate; actual usage is well within limits due to `VecFrameStack` compressing observations from `(210,160,3)` to `(84,84,4)`.
-
-**macOS:** `DummyVecEnv` is used automatically on macOS instead of `SubprocVecEnv` due to Python's `spawn` multiprocessing constraint. Training is slightly slower than Linux but functionally identical.
-
-**Observation pipeline:**
-```
-(210,160,3) RGB → NoopReset → MaxAndSkip → EpisodicLife →
-FireReset → ClipReward → WarpFrame(84,84) → VecFrameStack(4) → (84,84,4)
-```
-
-**GreedyQPolicy:** During evaluation, `action = argmax Q(s,a)` with `deterministic=True`. No exploration is applied; the agent always selects the highest Q-value action.
+- Memory warning about replay buffer is a worst-case estimate — safe with `VecFrameStack` compressing obs to `(84,84,4)`.
+- macOS uses `DummyVecEnv` automatically instead of `SubprocVecEnv`.
+- Observation pipeline: `(210,160,3) → WarpFrame(84,84) → Grayscale → VecFrameStack(4) → (84,84,4)`
+- GreedyQPolicy during evaluation: `action = argmax Q(s,a)`, `deterministic=True`, no exploration.
 
 ---
 
-*Formative 3 — Deep Q-Learning | Student: Gatwaza | ALE/DemonAttack-v5 | Stable Baselines 3*
+*Formative 3 · Gatwaza · DemonAttack-v5 · CnnPolicy · Stable Baselines 3*
