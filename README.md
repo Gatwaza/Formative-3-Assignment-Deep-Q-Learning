@@ -136,32 +136,6 @@ python3 run_experiments.py --timesteps 500000
 *All 10 experiments compared. Exp 6 (Large Batch) dominates clearly.*
 
 ---
-
-## 7. Demo Videos
-
-### Training in Progress
-
-![Training in progress](screenshots/training.gif)
-
-*Simultaneous training (left) and live agent play (right) via `atari_dqn_gui.py`. Left shows reward chart updating in real time; right shows live game feed auto-reloading the model every 10,000 steps.*
-
----
-
-### Agent Playing — Experiment Selector
-
-![Agent playing](screenshots/playing.gif)
-
-*`play.py` experiment selector: switch between any of the 10 trained models live, comparison bar chart updates after each episode showing which experiment outperforms others.*
-
----
-
-### Experiment Summary Chart
-
-![Experiment summary](screenshots/summary_chart.png)
-
-*Grouped bar chart comparing mean score, best score, and last-20-episode mean across all 10 experiments. Best experiment (#6 Large Batch) clearly dominates with last-20 mean of 1566.8.*
-
----
 ## Notes
 
 - Memory warning about replay buffer is a worst-case estimate — safe with `VecFrameStack` compressing obs to `(84,84,4)`.
