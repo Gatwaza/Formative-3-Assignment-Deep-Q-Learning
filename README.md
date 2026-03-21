@@ -119,19 +119,19 @@ python3 run_experiments.py --timesteps 500000
 
 ### Training
 
-![Training](screenshots/training.gif)
+![Training](Gatwaza/screenshots/training.gif)
 
 *Split-screen: training reward chart (left) + live agent feed auto-reloading every 10k steps (right).*
 
 ### Agent Playing
 
-![Playing](screenshots/playing.gif)
+![Playing](Gatwaza/screenshots/playing.gif)
 
 *Experiment selector GUI — switch between trained models live, comparison chart updates each episode.*
 
 ### Summary Chart
 
-![Summary](screenshots/summary_chart.png)
+![Summary](Gatwaza/screenshots/summary_chart.png)
 
 *All 10 experiments compared. Exp 6 (Large Batch) dominates clearly.*
 
