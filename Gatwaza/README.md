@@ -1,6 +1,6 @@
 # Deep Q-Learning — ALE/DemonAttack-v5
 
-**All group Members**
+**Member:** Jean Robert Gatwaza  
 **Environment:** `ALE/DemonAttack-v5`  
 **Algorithm:** DQN — Stable Baselines 3  
 **Policy:** `CnnPolicy` — all 10 experiments  
@@ -45,7 +45,6 @@ AutoROM --accept-license
 
 ```bash
 # All 10 experiments
-cd Gatwaza
 python3 run_experiments.py --timesteps 500000
 
 # Single run
@@ -146,4 +145,4 @@ python3 run_experiments.py --timesteps 500000
 
 ---
 
-*Formative 3 · DemonAttack-v5 · CnnPolicy · Stable Baselines 3*
+*Formative 3 · Gatwaza · DemonAttack-v5 · CnnPolicy · Stable Baselines 3*
