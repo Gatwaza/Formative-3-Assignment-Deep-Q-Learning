@@ -1,6 +1,6 @@
 # Deep Q-Learning — ALE/DemonAttack-v5
 
-**Group Members:** Group 15: Jean Robert Gatwaza, Inshuti Joyeuse Souvede, and Thierry Shyaka
+**Group Members:** Group 15: Jean Robert Gatwaza, Inshuti Joyeuse Souvede, and Thierry Shyaka  
 **Environment:** `ALE/DemonAttack-v5`  
 **Algorithm:** DQN — Stable Baselines 3  
 **Policy:** `CnnPolicy` — all 10 experiments  
