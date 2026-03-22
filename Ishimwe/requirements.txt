@@ -1,0 +1,10 @@
+# requirements.txt — DQN Demon Attack project
+# Install with: pip install -r requirements.txt
+
+gymnasium[atari,accept-rom-license]
+stable-baselines3[extra]
+ale-py
+autorom[accept-rom-license]
+numpy
+matplotlib
+tensorboard
