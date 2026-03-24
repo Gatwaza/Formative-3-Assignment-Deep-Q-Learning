@@ -116,6 +116,99 @@ python3 run_experiments.py --timesteps 500000
 
 ---
 
+## Experiments — Thierry
+
+| # | Experiment | LR | Gamma | Batch | ε Start | ε End | ε Decay | Mean Reward | Best Reward | Episodes | Noted Behavior |
+|---|-----------|-----|-------|-------|---------|-------|---------|-------------|-------------|----------|----------------|
+| 1 | Baseline | 0.0001 | 0.99 | 32 | 1.0 | 0.01 | 0.10 | 7.70 | 39.00 | 1442 | Solid baseline. Stable learning with moderate exploration. Agent learns to shoot enemies consistently. |
+| 2 | High LR | 0.001 | 0.99 | 32 | 1.0 | 0.01 | 0.10 | 5.55 | 44.00 | 1375 | LR too high — Q-values become unstable. Lower mean reward despite higher best single episode. |
+| 3 | Low LR | 5e-05 | 0.99 | 32 | 1.0 | 0.01 | 0.10 | 4.30 | 33.00 | 1470 | LR too low — convergence too slow. Agent barely improves within 100k steps. Worst performer. |
+| 4 | Low Gamma | 0.0001 | 0.95 | 32 | 1.0 | 0.01 | 0.10 | 4.75 | 45.00 | 1444 | Lower gamma makes agent myopic — ignores long-term survival. Below baseline performance. |
+| 5 | High Gamma | 0.0001 | 0.999 | 32 | 1.0 | 0.01 | 0.10 | 5.25 | 39.00 | 1315 | Agent plans too far ahead. Slower early learning. Slight improvement over low gamma but below baseline. |
+| 6 | Large Batch | 0.0001 | 0.99 | 64 | 1.0 | 0.01 | 0.10 | 9.05 | 44.00 | 1249 | Larger batch = more stable gradient updates. Clear jump in mean reward over baseline. |
+| 7 | Larger Batch | 0.0001 | 0.99 | 128 | 1.0 | 0.01 | 0.10 | 10.80 | 56.00 | 1219 | Best reward of any single experiment. Very stable learning curve. Highest best reward (56.00). |
+| 8 | High Epsilon End | 0.0001 | 0.99 | 32 | 1.0 | 0.05 | 0.10 | 10.65 | 43.00 | 1358 | More residual exploration. Strong mean reward but lower best — agent keeps trying suboptimal actions. |
+| 9 | Fast Epsilon Decay | 0.0001 | 0.99 | 32 | 1.0 | 0.01 | 0.20 | 6.05 | 34.00 | 1500 | Exploits too early — gets stuck in local optima. Poor performance despite most episodes completed. |
+| 10 | **Best Combo** ✅ | **0.0001** | **0.99** | **64** | **1.0** | **0.01** | **0.15** | **11.20** | **42.00** | **1332** | **Best mean reward (11.20). Balanced epsilon decay + larger batch = most consistent improvement. Selected for final training.** |
+
+### Final Training Results (Best Config — Exp 10)
+
+| Metric | Value |
+|--------|-------|
+| Config | lr=0.0001, gamma=0.99, batch=64, ε: 1.0→0.01, decay=0.15 |
+| Total Steps | 500,000 |
+| Total Episodes | **5,308** |
+| Mean Reward (last 20 eps) | **9.70** |
+| Best Episode Reward | **85.00** 🏆 |
+| Training Time | **47.5 min** (Tesla T4 GPU) |
+
+## Key Insights from Hyperparameter Tuning
+
+- **Learning Rate:** `0.0001` is the sweet spot. `0.001` causes instability; `5e-05` is too slow to converge.
+- **Gamma:** `0.99` works best for Demon Attack. Lower values make the agent shortsighted; higher values slow early learning.
+- **Batch Size:** Larger batches (`64–128`) produce more stable gradient estimates and consistently better performance. Batch 128 achieved the highest best reward (56.00).
+- **Epsilon Decay:** A moderate decay of `0.10–0.15` gives the agent enough exploration time. Fast decay (`0.20`) causes early exploitation and poor long-term performance.
+- **Best Config:** Combining `batch=64` with `eps_decay=0.15` gave the highest mean reward (11.20) — the balance between stable updates and adequate exploration was key.
+
+---
+
+Experiments — Souvede
+
+| #   | Experiment       | Learning Rate | Gamma | Batch Size | Epsilon (start→end) | Decay |
+| --- | ---------------- | ------------- | ----- | ---------- | ------------------- | ----- |
+| 1   | baseline         | 1e-4          | 0.99  | 32         | 1.0 → 0.05          | 0.1   |
+| 2   | high_lr          | 5e-4          | 0.99  | 32         | 1.0 → 0.05          | 0.1   |
+| 3   | low_lr           | 1e-5          | 0.99  | 32         | 1.0 → 0.05          | 0.1   |
+| 4   | low_gamma        | 1e-4          | 0.95  | 32         | 1.0 → 0.05          | 0.1   |
+| 5   | high_gamma       | 1e-4          | 0.999 | 32         | 1.0 → 0.05          | 0.1   |
+| 6   | large_batch      | 1e-4          | 0.99  | 64         | 1.0 → 0.05          | 0.1   |
+| 7   | small_batch      | 1e-4          | 0.99  | 16         | 1.0 → 0.05          | 0.1   |
+| 8   | slow_exploration | 1e-4          | 0.99  | 32         | 1.0 → 0.05          | 0.3   |
+| 9   | high_final_eps   | 1e-4          | 0.99  | 32         | 1.0 → 0.10          | 0.1   |
+| 10  | optimized        | 2.5e-4        | 0.99  | 32         | 1.0 → 0.01          | 0.15  |
+
+### Results (500,000 timesteps each)
+
+| Experiment       | Mean Reward | Std Dev | Best Eval Reward | Episodes |
+| ---------------- | ----------- | ------- | ---------------- | -------- |
+| **high_gamma**   | 7.80        | 10.81   | **36.4**         | 6728     |
+| baseline         | 7.80        | 11.04   | 23.4             | 6672     |
+| large_batch      | 7.72        | 10.79   | 27.0             | 6538     |
+| small_batch      | 7.26        | 10.25   | 22.4             | 6594     |
+| low_gamma        | 7.21        | 10.32   | 24.0             | 7138     |
+| high_lr          | 6.65        | 9.02    | 23.0             | 7360     |
+| low_lr           | 4.37        | 5.04    | 10.2             | 8435     |
+| slow_exploration | —           | —       | 11.0             | —        |
+| high_final_eps   | —           | —       | —                | —        |
+| optimized        | —           | —       | —                | —        |
+
+> **Note**: Experiments marked with "—" did not complete fully. `slow_exploration` has partial evaluation data; `high_final_eps` and `optimized` were interrupted before completion.
+
+**Best Configuration**: `high_gamma` (γ=0.999) achieved the highest evaluation reward of **36.4**, showing that long-term reward consideration is crucial for Demon Attack.
+
+## Key Features
+
+### Resumable Experiments
+
+**Challenge**: Training 10 experiments sequentially takes many hours. If the terminal is killed mid-training, all progress could be lost.
+
+**Solution**: The training script now supports resumable experiments:
+
+- Completed experiments are automatically detected and skipped on restart
+- Checkpoints are saved every 50,000 timesteps for recovery
+- Best model is saved whenever evaluation improves
+- Results are aggregated from disk, so any completed experiment counts
+
+---
+
+## Demo
+
+## Agent Gameplay - Thierry
+
+> *(https://drive.google.com/file/d/1Npr4AmQnrSO78M6_10__DziMD-xBCQav/view?usp=sharing)*
+
+---
+
 ## Demo
 
 ### Training
@@ -124,7 +217,7 @@ python3 run_experiments.py --timesteps 500000
 
 *Split-screen: training reward chart (left) + live agent feed auto-reloading every 10k steps (right).*
 
-### Agent Playing
+### Agent Playing - Gatwaza
 
 ![Playing](Gatwaza/screenshots/playing.gif)
 
