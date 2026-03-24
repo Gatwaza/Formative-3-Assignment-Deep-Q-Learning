@@ -1,7 +1,7 @@
 """
 play.py — ALE/DemonAttack-v5
 
-you can play GUI with experiment selector — choose any of the 10 trained
+Play GUI with experiment selector — choose any of the 10 trained
 experiment models and switch between them live to compare performance.
 
 Features:
@@ -14,6 +14,7 @@ Features:
 Usage:
     python3 play.py
     python3 play.py --model dqn_best.zip
+    python3 play.py --model dqn_best.zip --episodes 5
 """
 
 import argparse
@@ -64,9 +65,7 @@ EXP_COLORS = [
 ]
 
 
-
-# Helpers
-
+# ── Helpers ───────────────────────────────────────────────────────────────────
 def discover_models() -> list[dict]:
     """
     Scan working directory and logs/ for all saved experiment models.
@@ -84,21 +83,17 @@ def discover_models() -> list[dict]:
             models.append({"label": label, "path": fname, "exp_id": None})
 
     # experiment models saved by run_experiments.py
-    # pattern: logs/experiments_<tag>/exp_NN_<Label>_model.zip
     for path in sorted(glob.glob("logs/experiments_*/exp_*_model.zip")):
         fname = os.path.basename(path)
-        # parse exp number from filename
         try:
             exp_num = int(fname.split("_")[1])
         except (IndexError, ValueError):
             exp_num = 0
-        # make a clean label from filename
         label_raw = fname.replace("_model.zip","").replace("_"," ")
         label = f"Exp {exp_num:>2} — {' '.join(label_raw.split()[2:])}"
         models.append({"label": label, "path": path, "exp_id": exp_num})
 
-    # deduplicate by path keeping first occurrence
-    seen = set()
+    seen   = set()
     unique = []
     for m in models:
         if m["path"] not in seen:
@@ -111,9 +106,7 @@ def discover_models() -> list[dict]:
     ]
 
 
-
-# GUI
-
+# ── GUI ───────────────────────────────────────────────────────────────────────
 class PlayGUI:
     def __init__(self, root: tk.Tk, args):
         self.root    = root
@@ -121,16 +114,12 @@ class PlayGUI:
         self.running = False
         self._fq: queue.Queue = queue.Queue(maxsize=4)
 
-        # per-session stats
         self.current_label   = ""
         self.ep_rewards      = []
         self.play_ep         = 0
         self.total_steps     = 0
-
-        # comparison store: {label: [scores]}
         self.comparison: dict[str, list[float]] = {}
 
-        # model switch request from UI thread to play thread
         self._switch_model_path  = None
         self._switch_model_label = None
         self._switch_lock        = threading.Lock()
@@ -142,7 +131,7 @@ class PlayGUI:
         self._build()
         root.after(28, self._poll_frame)
 
-    # build
+    # ── build ─────────────────────────────────────────────────────────────────
     def _build(self):
         # header
         hdr = tk.Frame(self.root, bg=PANEL, height=52)
@@ -164,7 +153,7 @@ class PlayGUI:
         tk.Label(sel, text="  Model:", font=FB, bg=CARD, fg=ACC1
                  ).pack(side=tk.LEFT, padx=(12,4), pady=10)
 
-        self.models      = discover_models()
+        self.models       = discover_models()
         self.model_labels = [m["label"] for m in self.models]
         self.sel_var      = tk.StringVar(value=self.model_labels[0])
 
@@ -218,7 +207,6 @@ class PlayGUI:
                   command=self._reset_scores
                   ).pack(side=tk.LEFT, padx=4)
 
-        # current model label
         self.cur_lbl = tk.Label(sel, text="No model loaded",
                                 font=FT, bg=CARD, fg=MUTED)
         self.cur_lbl.pack(side=tk.RIGHT, padx=16)
@@ -231,7 +219,6 @@ class PlayGUI:
         left = tk.Frame(body, bg=BG)
         left.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
-        # stat chips
         stat_f = tk.Frame(left, bg=CARD, height=36)
         stat_f.pack(fill=tk.X, pady=(0,4))
         stat_f.pack_propagate(False)
@@ -251,7 +238,6 @@ class PlayGUI:
                      ).pack(anchor=tk.W)
             self.sv[key] = var
 
-        # canvas
         cf = tk.Frame(left, bg=CARD)
         cf.pack(fill=tk.BOTH, expand=True, pady=(0,4))
         tk.Label(cf, text="LIVE FEED  |  210×160 RGB",
@@ -260,7 +246,6 @@ class PlayGUI:
         self.canvas.pack(fill=tk.BOTH, expand=True, padx=6, pady=(0,6))
         self._ph()
 
-        # episode score chart (current model)
         ec = tk.Frame(left, bg=CARD, height=170)
         ec.pack(fill=tk.X, pady=(0,4))
         ec.pack_propagate(False)
@@ -273,13 +258,11 @@ class PlayGUI:
         self.ep_cv = FigureCanvasTkAgg(self.ep_fig, master=ec)
         self.ep_cv.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=6, pady=(0,6))
 
-        # status bar
         self.status_var = tk.StringVar(value="Select a model and press ▶ LOAD & PLAY")
         tk.Label(left, textvariable=self.status_var,
                  font=FT, bg=BG, fg=MUTED, anchor=tk.W
                  ).pack(fill=tk.X, pady=2)
 
-        # divider
         tk.Frame(body, bg="#1a1a40", width=2).pack(side=tk.LEFT, fill=tk.Y, padx=6)
 
         # RIGHT: comparison
@@ -297,15 +280,14 @@ class PlayGUI:
 
         cmp_f = tk.Frame(right, bg=CARD)
         cmp_f.pack(fill=tk.BOTH, expand=True, pady=(6,4))
-        self.cmp_fig, self.cmp_ax = plt.subplots(figsize=(4.2,6.5),
-                                                   facecolor=CARD)
+        self.cmp_fig, self.cmp_ax = plt.subplots(figsize=(4.2,6.5), facecolor=CARD)
         self.cmp_ax.set_facecolor(DARK)
         self._sax(self.cmp_ax)
-        self.cmp_fig.subplots_adjust(left=0.38, right=0.97, top=0.97, bottom=0.06)
+        self.cmp_fig.subplots_adjust(
+            left=0.38, right=0.97, top=0.97, bottom=0.06)
         self.cmp_cv = FigureCanvasTkAgg(self.cmp_fig, master=cmp_f)
         self.cmp_cv.get_tk_widget().pack(fill=tk.BOTH, expand=True, padx=4, pady=4)
 
-        # scoreboard table
         sb_f = tk.Frame(right, bg=CARD)
         sb_f.pack(fill=tk.X, pady=(0,4))
         tk.Label(sb_f, text="SCOREBOARD  (last 10 eps mean)",
@@ -316,7 +298,7 @@ class PlayGUI:
                                   state=tk.DISABLED, bd=4)
         self.score_text.pack(fill=tk.X, padx=6, pady=(0,6))
 
-    # helpers
+    # ── helpers ───────────────────────────────────────────────────────────────
     def _ph(self):
         self.canvas.delete("all")
         self.canvas.create_text(400, 200, fill=MUTED,
@@ -349,12 +331,12 @@ class PlayGUI:
             pass
         self.root.after(28, self._poll_frame)
 
-    # charts
+    # ── charts ────────────────────────────────────────────────────────────────
     def _redraw_ep_chart(self):
         rewards = list(self.ep_rewards)
         self.ep_ax.clear(); self.ep_ax.set_facecolor(DARK); self._sax(self.ep_ax)
         if rewards:
-            xs = list(range(1, len(rewards)+1))
+            xs    = list(range(1, len(rewards)+1))
             color = self._label_color(self.current_label)
             self.ep_ax.fill_between(xs, rewards, alpha=0.2, color=color)
             self.ep_ax.plot(xs, rewards, color=color, lw=1.3)
@@ -371,45 +353,37 @@ class PlayGUI:
         self.cmp_ax.clear()
         self.cmp_ax.set_facecolor(DARK)
         self._sax(self.cmp_ax)
-
         if not self.comparison:
-            self.cmp_fig.subplots_adjust(left=0.38, right=0.97, top=0.97, bottom=0.06)
+            self.cmp_fig.subplots_adjust(
+                left=0.38, right=0.97, top=0.97, bottom=0.06)
             self.cmp_cv.draw()
             return
-
-        labels  = list(self.comparison.keys())
-        means   = [np.mean(v[-10:]) if v else 0 for v in self.comparison.values()]
-        bests   = [max(v) if v else 0          for v in self.comparison.values()]
-        colors  = [self._label_color(l)        for l in labels]
-        y       = np.arange(len(labels))
-
-        # horizontal bars — easier to read with long labels
-        bars = self.cmp_ax.barh(y - 0.2, means, height=0.35,
+        labels = list(self.comparison.keys())
+        means  = [np.mean(v[-10:]) if v else 0 for v in self.comparison.values()]
+        bests  = [max(v) if v else 0            for v in self.comparison.values()]
+        colors = [self._label_color(l)          for l in labels]
+        y      = np.arange(len(labels))
+        bars = self.cmp_ax.barh(y-0.2, means, height=0.35,
                                 color=colors, alpha=0.9, label="Mean last 10")
-        self.cmp_ax.barh(y + 0.2, bests, height=0.35,
+        self.cmp_ax.barh(y+0.2, bests, height=0.35,
                          color=colors, alpha=0.35, label="Best score")
-
-        # value labels on bars
         for bar, val in zip(bars, means):
             if val > 0:
                 self.cmp_ax.text(
-                    bar.get_width() + 20, bar.get_y() + bar.get_height()/2,
+                    bar.get_width()+20, bar.get_y()+bar.get_height()/2,
                     f"{val:.0f}", va="center", color=TEXT, fontsize=7)
-
         short_labels = [l[:22] for l in labels]
         self.cmp_ax.set_yticks(y)
         self.cmp_ax.set_yticklabels(short_labels, color=TEXT, fontsize=7)
         self.cmp_ax.set_xlabel("Score", color=MUTED, fontsize=7)
         self.cmp_ax.legend(fontsize=6, facecolor=PANEL,
                            labelcolor=TEXT, loc="lower right")
-
-        # highlight best
         if means:
             best_idx = int(np.argmax(means))
             self.cmp_ax.get_yticklabels()[best_idx].set_color(ACC4)
             self.cmp_ax.get_yticklabels()[best_idx].set_fontweight("bold")
-
-        self.cmp_fig.subplots_adjust(left=0.38, right=0.97, top=0.97, bottom=0.06)
+        self.cmp_fig.subplots_adjust(
+            left=0.38, right=0.97, top=0.97, bottom=0.06)
         self.cmp_cv.draw()
         self._update_scoreboard(labels, means, bests)
 
@@ -421,18 +395,15 @@ class PlayGUI:
             marker = "★" if i == 1 else f"{i} "
             lines.append(f"{marker} {lbl[:24]:<24}\n"
                          f"   mean={mean:>7.0f}  best={best:>7.0f}\n")
-
         self.score_text.config(state=tk.NORMAL)
         self.score_text.delete("1.0", tk.END)
         self.score_text.insert(tk.END, "\n".join(lines))
         self.score_text.config(state=tk.DISABLED)
 
     def _label_color(self, label: str) -> str:
-        # assign consistent colour per label
-        idx = hash(label) % len(EXP_COLORS)
-        return EXP_COLORS[idx]
+        return EXP_COLORS[hash(label) % len(EXP_COLORS)]
 
-    # controls
+    # ── controls ──────────────────────────────────────────────────────────────
     def _refresh_models(self):
         self.models       = discover_models()
         self.model_labels = [m["label"] for m in self.models]
@@ -440,32 +411,32 @@ class PlayGUI:
         self.status_var.set(f"Refreshed — {len(self.models)} models found.")
 
     def _load_selected(self):
-        sel_label = self.sel_var.get()
-        model_info = next((m for m in self.models if m["label"] == sel_label), None)
+        sel_label  = self.sel_var.get()
+        model_info = next(
+            (m for m in self.models if m["label"] == sel_label), None)
         if model_info is None or model_info["path"] is None:
             self.status_var.set("No valid model selected.")
             return
-
         path = model_info["path"]
         if not os.path.exists(path):
             self.status_var.set(f"File not found: {path}")
             return
-
         if self.running:
-            # signal play thread to switch model
             with self._switch_lock:
                 self._switch_model_path  = path
                 self._switch_model_label = sel_label
-            self.status_var.set(f"Switching to {sel_label} after this episode...")
+            self.status_var.set(
+                f"Switching to {sel_label} after this episode...")
         else:
-            # start fresh
-            self.running = True
+            self.running       = True
             self.ep_rewards.clear()
-            self.play_ep    = 0
-            self.total_steps = 0
+            self.play_ep       = 0
+            self.total_steps   = 0
             self.current_label = sel_label
             self.cur_lbl.config(text=sel_label, fg=ACC1)
-            self.run_btn.config(text=" STOP ", bg=ACC2, fg="black", font=("Courier",9,"bold"), activebackground=ACC2, activeforeground="black")
+            self.run_btn.config(text=" STOP ", bg=ACC2, fg="black",
+                                font=FB, activebackground=ACC2,
+                                activeforeground="black")
             self.status_var.set(f"Loading {sel_label}...")
             threading.Thread(
                 target=self._play_thread,
@@ -476,7 +447,9 @@ class PlayGUI:
     def _toggle(self):
         if self.running:
             self.running = False
-            self.run_btn.config(text=" START ", bg="white", fg="black", font=("Courier",9,"bold"), activebackground="#dddddd", activeforeground="black")
+            self.run_btn.config(text=" START ", bg="white", fg="black",
+                                font=FB, activebackground="#dddddd",
+                                activeforeground="black")
             self.status_var.set("Stopped.")
         else:
             self._load_selected()
@@ -492,23 +465,24 @@ class PlayGUI:
         self.ep_ax.clear(); self.ep_ax.set_facecolor(DARK); self._sax(self.ep_ax)
         self.ep_fig.tight_layout(pad=0.4); self.ep_cv.draw()
         self.cmp_ax.clear(); self.cmp_ax.set_facecolor(DARK); self._sax(self.cmp_ax)
-        self.cmp_fig.subplots_adjust(left=0.38, right=0.97, top=0.97, bottom=0.06); self.cmp_cv.draw()
+        self.cmp_fig.subplots_adjust(
+            left=0.38, right=0.97, top=0.97, bottom=0.06)
+        self.cmp_cv.draw()
         self.score_text.config(state=tk.NORMAL)
         self.score_text.delete("1.0", tk.END)
         self.score_text.config(state=tk.DISABLED)
         self._ph()
         self.cur_lbl.config(text="No model loaded", fg=MUTED)
         self.run_btn.config(text=" START ", bg="white", fg="black",
-                            font=("Courier",9,"bold"),
-                            activebackground="#dddddd", activeforeground="black")
+                            font=FB, activebackground="#dddddd",
+                            activeforeground="black")
         self.status_var.set("Scores reset.")
 
-    # play thread
+    # ── play thread ───────────────────────────────────────────────────────────
     def _play_thread(self, initial_path: str, initial_label: str):
         try:
             current_path  = initial_path
             current_label = initial_label
-
             model = DQN.load(current_path)
 
             model_env = VecFrameStack(
@@ -517,11 +491,14 @@ class PlayGUI:
                 n_stack=4)
             display_env = gym.make(ENV_ID, render_mode="rgb_array")
 
-            self.status_var.set(
-                f"Playing: {current_label}  |  GreedyQPolicy  |  argmax Q(s,a)")
+            # respect --episodes flag if provided
+            max_ep = self.args.episodes if hasattr(self.args, 'episodes') else 0
 
-            while self.running:
-                # check for model switch request
+            self.status_var.set(
+                f"Playing: {current_label}  |  GreedyQPolicy  |  argmax Q(s,a)"
+                + (f"  |  {max_ep} episodes" if max_ep > 0 else ""))
+
+            while self.running and (max_ep == 0 or self.play_ep < max_ep):
                 with self._switch_lock:
                     if self._switch_model_path is not None:
                         current_path  = self._switch_model_path
@@ -567,7 +544,6 @@ class PlayGUI:
                     self.sv["ep"].set(str(self.play_ep))
                     self.sv["best"].set(f"{best:.0f}")
 
-                    # update comparison store
                     if current_label not in self.comparison:
                         self.comparison[current_label] = []
                     self.comparison[current_label].append(ep_r)
@@ -584,30 +560,42 @@ class PlayGUI:
             model_env.close()
             display_env.close()
             self.running = False
-            self.run_btn.config(text=" START ", bg="white", fg="black", font=("Courier",9,"bold"), activebackground="#dddddd", activeforeground="black")
+            self.run_btn.config(text=" START ", bg="white", fg="black",
+                                font=FB, activebackground="#dddddd",
+                                activeforeground="black")
+            # show done message when episode limit reached
+            if max_ep > 0 and self.play_ep >= max_ep:
+                mean_r = np.mean(self.ep_rewards) if self.ep_rewards else 0
+                best_r = max(self.ep_rewards)     if self.ep_rewards else 0
+                self.status_var.set(
+                    f"Done — {self.play_ep} episodes  |  "
+                    f"mean={mean_r:.0f}  best={best_r:.0f}")
 
         except Exception as exc:
             self.status_var.set(f"Error: {exc}")
             self.running = False
-            self.run_btn.config(text=" START ", bg="white", fg="black", font=("Courier",9,"bold"), activebackground="#dddddd", activeforeground="black")
+            self.run_btn.config(text=" START ", bg="white", fg="black",
+                                font=FB, activebackground="#dddddd",
+                                activeforeground="black")
 
 
-# main
+# ── main ──────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     p = argparse.ArgumentParser(
-        description="Play any experiment model on DemonAttack-v5")
-    p.add_argument("--model", default=None,
+        description="Play DemonAttack-v5 experiment models — Gatwaza")
+    p.add_argument("--model",    default=None,
                    help="Pre-select a model path on launch")
+    p.add_argument("--episodes", type=int, default=0,
+                   help="Number of episodes to play (0 = infinite)")
     args = p.parse_args()
 
     root = tk.Tk()
     gui  = PlayGUI(root, args)
 
-    # auto-load if model path passed
     if args.model and os.path.exists(args.model):
-        # find matching entry or add it
         if args.model not in [m["path"] for m in gui.models]:
-            gui.models.append({"label": args.model, "path": args.model, "exp_id": None})
+            gui.models.append(
+                {"label": args.model, "path": args.model, "exp_id": None})
             gui.model_labels.append(args.model)
             gui.sel_combo["values"] = gui.model_labels
         gui.sel_var.set(args.model)
