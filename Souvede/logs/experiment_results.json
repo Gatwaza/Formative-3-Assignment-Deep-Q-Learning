@@ -1,0 +1,34 @@
+[
+  {
+    "experiment": "low_lr",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "low_gamma",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "high_gamma",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "large_batch",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "small_batch",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "slow_exploration",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "high_final_eps",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  },
+  {
+    "experiment": "optimized",
+    "error": "You must install tqdm and rich in order to use the progress bar callback. It is included if you install stable-baselines with the extra packages: `pip install stable-baselines3[extra]`"
+  }
+]

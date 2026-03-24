@@ -1,0 +1,18 @@
+# DQN Atari Agent Dependencies
+
+# Reinforcement Learning
+stable-baselines3>=2.0.0
+gymnasium[atari]>=0.29.0
+gymnasium[accept-rom-license]>=0.29.0
+
+# Atari ROMs (required for Atari environments)
+ale-py>=0.8.0
+shimmy>=1.0.0
+
+# Additional utilities
+numpy>=1.24.0
+tensorboard>=2.13.0
+tqdm>=4.65.0
+
+# Optional: GPU support (uncomment if using CUDA)
+# torch>=2.0.0  # With CUDA support
